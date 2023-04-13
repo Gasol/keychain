@@ -1155,7 +1155,10 @@ while [ -n "$1" ]; do
 			systemdopt=true
 			;;
 		--gpg2)
-		    gpg_prog_name="gpg2"
+			gpg_prog_name="gpg2"
+		    ;;
+		--apple-use-keychain)
+			apple_use_keychain=true
 		    ;;
 		--)
 			shift
@@ -1313,7 +1316,10 @@ if [ -n "$timeout" ] && wantagent ssh; then
 	ssh_timeout="-t $ssh_timeout"
 fi
 
-# There are agents remaining to start, and we now know we can't be quick.  Take
+if [ -n "$apple_use_keychain" ] && wantagent ssh; then
+	ssh_apple_use_keychain=--apple-use-keychain
+fi
+# there are agents remaining to start, and we now know we can't be quick.  take
 # the lock before continuing
 takelock || die
 loadagents $agentsopt
@@ -1415,20 +1421,19 @@ if wantagent ssh; then
 			if $noguiopt || [ -z "$SSH_ASKPASS" -o -z "$DISPLAY" ]; then
 				unset DISPLAY		# DISPLAY="" can cause problems
 				unset SSH_ASKPASS	# make sure ssh-add doesn't try SSH_ASKPASS
-				sshout=$(ssh-add ${ssh_timeout} ${ssh_confirm} "$@" 2>&1)
+				sshout=$(ssh-add ${ssh_timeout} ${ssh_confirm} ${ssh_apple_use_keychain} "$@" 2>&1)
 			else
-				sshout=$(ssh-add ${ssh_timeout} ${ssh_confirm} "$@" 2>&1 </dev/null)
+				sshout=$(ssh-add ${ssh_timeout} ${ssh_confirm} ${ssh_apple_use_keychain} "$@" 2>&1 </dev/null)
 			fi
-			if [ $? = 0 ]
-		then
-			blurb=""
-			[ -n "$timeout" ] && blurb="life=${timeout}m"
-			[ -n "$timeout" ] && $confirmopt && blurb="${blurb},"
-			$confirmopt && blurb="${blurb}confirm"
-			[ -n "$blurb" ] && blurb=" (${blurb})"
-			mesg "ssh-add: Identities added: $(echo $sshkeys)${blurb}"
-			break
-		fi
+			if [ $? = 0 ]; then
+				blurb=""
+				[ -n "$timeout" ] && blurb="life=${timeout}m"
+				[ -n "$timeout" ] && $confirmopt && blurb="${blurb},"
+				$confirmopt && blurb="${blurb}confirm"
+				[ -n "$blurb" ] && blurb=" (${blurb})"
+				mesg "ssh-add: Identities added: $(echo $sshkeys)${blurb}"
+				break
+			fi
 			if [ $sshattempts = 1 ]; then
 				die "Problem adding; giving up"
 			else

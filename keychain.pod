@@ -7,7 +7,7 @@ keychain - re-use ssh-agent and/or gpg-agent between logins
 S<keychain [ -hklQqV ] [ --clear --confhost --gpg2 --help --ignore-missing --list>
 S<--noask --nocolor --nogui --nolock --quick --quiet --version ]>
 S<[ --agents I<list> ] [ --attempts I<num> ] [ --dir I<dirname> ]>
-S<[ --host I<name> ] [ --lockwait I<seconds> ]>
+S<[ --host I<name> ] [ --lockwait I<seconds> ] [ --apple-use-keychain ]>
 S<[ --stop I<which> ] [ --timeout I<minutes> ] [ keys... ]>
 
 =head1 DESCRIPTION
@@ -267,6 +267,11 @@ they want -- with all identities having the specified timeout, whether added by
 keychain or not. More advanced users can use one invocation of keychain to set
 the default timeout, and optionally set different timeouts for keys added by
 using a subsequent invocation of keychain.
+
+=item B<--apple-use-keychain>
+
+Each passphrase will also be stored in the user's keychain when adding
+identities. Only supported on macOS.
 
 =item B<-V --version>
 

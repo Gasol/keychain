@@ -5,7 +5,7 @@ SYNOPSIS
     keychain [ -hklQqV ] [ --clear --confhost --gpg2 --help --ignore-missing
      --list --noask --nocolor --nogui --nolock --quick --quiet --version ]
     [ --agents *list* ] [ --attempts *num* ] [ --dir *dirname* ]
-    [ --host *name* ] [ --lockwait *seconds* ]
+    [ --host *name* ] [ --lockwait *seconds* ] [ --apple-use-keychain ]
     [ --stop *which* ] [ --timeout *minutes* ] [ keys... ]
 
 DESCRIPTION
@@ -221,6 +221,10 @@ OPTIONS
         use one invocation of keychain to set the default timeout, and
         optionally set different timeouts for keys added by using a
         subsequent invocation of keychain.
+
+    --apple-use-keychain
+        Each passphrase will also be stored in the user's keychain when
+        adding identities. Only supported on macOS.
 
     -V --version
         Show version information.
